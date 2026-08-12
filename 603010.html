@@ -1,0 +1,1261 @@
+<!--
+Eigrutel Lab - Atelier d'outils libres pour la bande dessinée
+Programme conçu et développé par Simon Léturgie dans le cadre d'Eigrutel BD Academy.
+Nom : 60-30-10
+Version : 1.0.0
+Date : 12-08-2026
+Code : GNU AGPL v3.0 ou version ultérieure.
+Documentation et modèles : CC BY-SA 4.0, sauf mention contraire.
+Marques, logos et signes distinctifs Eigrutel / Eigrutel Lab / Eigrutel BD Academy : réservés.
+-->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>60-30-10</title>
+<link rel="icon" type="image/png" href="fav603010.png">
+<link rel="apple-touch-icon" href="fav603010.png">
+
+<style>
+:root{
+  --bg:#f2f3f5;
+  --card:#ffffff;
+  --ink:#15171a;
+  --muted:#6b7280;
+  --line:rgba(0,0,0,.1);
+  --shadow:0 0 0 1px var(--line);
+  --atelier:#A63D40;
+}
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  padding:10px;
+  background:var(--bg);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  color:var(--ink);
+}
+.wrap{
+  max-width:900px;
+  margin:auto;
+  display:grid;
+  gap:10px;
+}
+.panel{
+  background:var(--card);
+  border-radius:14px;
+  box-shadow:var(--shadow);
+  padding:10px;
+}
+.appHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.appTitle{
+  margin:0;
+  font-size:15px;
+  font-weight:850;
+  letter-spacing:.04em;
+}
+.headerTools{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.langSwitch{
+  display:flex;
+  gap:2px;
+  padding:2px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:#f7f8f9;
+}
+.langBtn{
+  appearance:none;
+  border:0;
+  border-radius:999px;
+  padding:6px 8px;
+  background:transparent;
+  color:var(--muted);
+  font:inherit;
+  font-size:10px;
+  font-weight:800;
+  cursor:pointer;
+}
+.langBtn.active{
+  background:#fff;
+  color:var(--ink);
+  box-shadow:0 0 0 1px var(--line);
+}
+.modeSwitch{
+  display:flex;
+  gap:6px;
+  padding:3px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:#f7f8f9;
+}
+.modeBtn{
+  appearance:none;
+  border:0;
+  border-radius:999px;
+  padding:8px 12px;
+  background:transparent;
+  color:var(--muted);
+  font:inherit;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+.modeBtn.active{
+  background:var(--atelier);
+  color:#fff;
+}
+.top{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+@media (min-width:860px){
+  .top{ grid-template-columns:180px 1fr; }
+}
+.previewWrap{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+}
+@media (min-width:860px){
+  .previewWrap{ justify-content:flex-start; }
+}
+.collage{
+  width:150px;
+  height:150px;
+  background:#eceef1;
+  position:relative;
+  overflow:hidden;
+  cursor:pointer;
+  border-radius:12px;
+  -webkit-tap-highlight-color:transparent;
+}
+.layer{
+  position:absolute;
+  inset:0;
+  transition:all .18s ease;
+}
+.dominant{ z-index:1; }
+.secondary{ z-index:2; }
+.accent{ z-index:3; }
+.tile{
+  width:100%;
+  height:100%;
+  border-radius:10px;
+}
+.modeHint{
+  width:150px;
+  margin:0;
+  font-size:11px;
+  line-height:1.3;
+  color:rgba(0,0,0,.62);
+}
+.globalHueWrap{
+  width:150px;
+  display:none;
+}
+body[data-mode="character"] .globalHueWrap{ display:block; }
+.globalHueLabel{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:4px;
+  font-size:11px;
+  color:var(--muted);
+}
+.globalHueHelp{
+  margin-top:4px;
+  font-size:11px;
+  line-height:1.3;
+  color:rgba(0,0,0,.68);
+}
+.controlsGrid{
+  display:grid;
+  gap:8px;
+}
+@media (min-width:860px){
+  .controlsGrid{ grid-template-columns:1fr 1fr 1fr; }
+}
+.modePanel{ display:none; }
+body[data-mode="classic"] #classicControls,
+body[data-mode="character"] #characterControls{ display:grid; }
+.group{
+  border:1px solid var(--line);
+  border-radius:12px;
+  overflow:hidden;
+}
+.groupHeader{
+  padding:6px 8px;
+  font-weight:800;
+  font-size:12px;
+  color:#fff;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+}
+.hexTag,
+.headerTag{
+  font-size:11px;
+  background:rgba(0,0,0,.18);
+  padding:3px 7px;
+  border-radius:999px;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+.groupBody{ padding:8px; }
+.row,
+.rangeHead{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  font-size:11px;
+  color:var(--muted);
+  margin-bottom:4px;
+}
+input[type=range]{ width:100%; }
+.label{
+  display:block;
+  font-size:11px;
+  color:var(--muted);
+  margin-bottom:4px;
+}
+select{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:10px 12px;
+  font:inherit;
+  background:#fff;
+  color:var(--ink);
+  margin-bottom:8px;
+}
+.rangeWrap{ margin:8px 0 10px; }
+.rangeValue{ font-variant-numeric:tabular-nums; }
+.characterNote{
+  font-size:12px;
+  line-height:1.35;
+  color:rgba(0,0,0,.72);
+}
+.keywords{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:8px;
+}
+.keyword{
+  font-size:11px;
+  padding:4px 8px;
+  border-radius:999px;
+  background:rgba(0,0,0,.06);
+}
+.band603010{
+  display:flex;
+  height:22px;
+  margin-top:8px;
+  background:#ddd;
+  border-radius:999px;
+  overflow:hidden;
+}
+.band60{ flex:60; }
+.band30{ flex:30; }
+.band10{ flex:10; }
+.rule603010{
+  font-size:13px;
+  line-height:1.35;
+  color:rgba(0,0,0,.72);
+}
+.formatsPanel{ display:grid; gap:10px; }
+.formatsTitle{
+  margin:0;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.formatsGrid{ display:grid; gap:8px; }
+@media (min-width:860px){
+  .formatsGrid{ grid-template-columns:1fr 1fr 1fr; }
+}
+.formatCard{
+  border:1px solid var(--line);
+  border-radius:12px;
+  overflow:hidden;
+  background:#fff;
+}
+.formatCardHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  padding:7px 8px;
+  font-size:12px;
+  font-weight:800;
+  color:#fff;
+}
+.formatCardHeader span:last-child{
+  font-size:11px;
+  background:rgba(0,0,0,.18);
+  padding:3px 7px;
+  border-radius:999px;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+.formatRows{
+  display:grid;
+  gap:5px;
+  padding:7px 8px 8px;
+}
+.formatRow{
+  display:grid;
+  grid-template-columns:48px minmax(0,1fr) auto;
+  gap:6px;
+  align-items:center;
+  padding:4px 6px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#fafafa;
+}
+.formatTag{
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.formatValue{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:11px;
+  color:var(--ink);
+}
+.copyBtn{
+  appearance:none;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:#fff;
+  color:var(--ink);
+  font:inherit;
+  font-size:10px;
+  font-weight:800;
+  line-height:1;
+  padding:5px 7px;
+  cursor:pointer;
+}
+.copyBtn:active{ transform:translateY(1px); }
+.copyBtn.copied{ background:#edf2f7; }
+@media (max-width:520px){
+  .formatRow{ grid-template-columns:42px minmax(0,1fr) auto; }
+  .formatValue{ font-size:10px; }
+  .copyBtn{ font-size:9px; padding:5px 6px; }
+}
+.eigrutel-app-footer{
+  width:100%;
+  padding:24px 16px;
+  text-align:center;
+  box-sizing:border-box;
+}
+.eigrutel-app-footer a{
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#1F3A44;
+  text-decoration:none;
+  opacity:.72;
+}
+.eigrutel-app-footer a:hover{ opacity:1; }
+</style>
+</head>
+
+<body data-mode="classic">
+<div class="wrap">
+
+  <div class="panel appHeader">
+    <h1 class="appTitle">60-30-10</h1>
+    <div class="headerTools">
+      <div class="langSwitch" aria-label="Langue / Language">
+        <button class="langBtn active" type="button" id="langFrBtn">FR</button>
+        <button class="langBtn" type="button" id="langEnBtn">EN</button>
+      </div>
+      <div class="modeSwitch" id="modeSwitch" aria-label="Choix du mode">
+        <button class="modeBtn active" type="button" id="classicModeBtn" data-mode-target="classic">Classique</button>
+        <button class="modeBtn" type="button" id="characterModeBtn" data-mode-target="character">Caractère</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel top">
+    <div class="previewWrap">
+      <div class="collage" id="collage" title="Clic : randomiser la disposition">
+        <div class="layer dominant" id="domLayer"><div class="tile" id="domTile"></div></div>
+        <div class="layer secondary" id="secLayer"><div class="tile" id="secTile"></div></div>
+        <div class="layer accent" id="accLayer"><div class="tile" id="accTile"></div></div>
+      </div>
+      <p class="modeHint" id="modeHint">Clic sur le carré : nouvelle disposition.</p>
+
+      <div class="globalHueWrap">
+        <div class="globalHueLabel"><span id="globalHueLabelText">Teinte générale</span><span class="rangeValue" id="globalHueVal">0°</span></div>
+        <input id="globalHue" type="range" min="-180" max="180" value="0">
+        <div class="globalHueHelp" id="globalHueHelp">Décale simultanément les trois teintes sans changer leur caractère.</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="controlsGrid modePanel" id="classicControls">
+        <div class="group">
+          <div class="groupHeader" id="hdrDomClassic">
+            <span id="labelDomClassic">Dominante 60%</span><span class="hexTag" id="hexDom">#----</span>
+          </div>
+          <div class="groupBody">
+            <div class="row"><span>L</span><span id="domLVal"></span></div>
+            <input id="domL" type="range" min="0" max="100" value="80">
+            <div class="row"><span>C</span><span id="domCVal"></span></div>
+            <input id="domC" type="range" min="0" max="0.4" step="0.01" value="0.14">
+            <div class="row"><span>H</span><span id="domHVal"></span></div>
+            <input id="domH" type="range" min="0" max="360" value="51">
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="groupHeader" id="hdrSecClassic">
+            <span id="labelSecClassic">Secondaire 30%</span><span class="hexTag" id="hexSec">#----</span>
+          </div>
+          <div class="groupBody">
+            <div class="row"><span>L</span><span id="secLVal"></span></div>
+            <input id="secL" type="range" min="0" max="100" value="33">
+            <div class="row"><span>C</span><span id="secCVal"></span></div>
+            <input id="secC" type="range" min="0" max="0.4" step="0.01" value="0.12">
+            <div class="row"><span>H</span><span id="secHVal"></span></div>
+            <input id="secH" type="range" min="0" max="360" value="86">
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="groupHeader" id="hdrAccClassic">
+            <span id="labelAccClassic">Accent 10%</span><span class="hexTag" id="hexAcc">#----</span>
+          </div>
+          <div class="groupBody">
+            <div class="row"><span>L</span><span id="accLVal"></span></div>
+            <input id="accL" type="range" min="0" max="100" value="75">
+            <div class="row"><span>C</span><span id="accCVal"></span></div>
+            <input id="accC" type="range" min="0" max="0.4" step="0.01" value="0.13">
+            <div class="row"><span>H</span><span id="accHVal"></span></div>
+            <input id="accH" type="range" min="0" max="360" value="200">
+          </div>
+        </div>
+      </div>
+
+      <div class="controlsGrid modePanel" id="characterControls">
+        <div class="group">
+          <div class="groupHeader" id="hdrDomChar">
+            <span id="labelDomChar">Dominante 60%</span><span class="headerTag" id="tagDom">Vivid</span>
+          </div>
+          <div class="groupBody">
+            <label class="label" for="domCharacter" id="domCharacterLabel">Caractère principal</label>
+            <select id="domCharacter"></select>
+            <div class="rangeWrap">
+              <div class="rangeHead"><span class="hueLabel">Teinte</span><span class="rangeValue" id="domHueVal">0°</span></div>
+              <input id="domHue" type="range" min="0" max="360" value="0">
+            </div>
+            <div class="characterNote" id="domNote"></div>
+            <div class="keywords" id="domKeywords"></div>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="groupHeader" id="hdrSecChar">
+            <span id="labelSecChar">Secondaire 30%</span><span class="headerTag" id="tagSec">Muted</span>
+          </div>
+          <div class="groupBody">
+            <label class="label" for="secCharacter" id="secCharacterLabel">Caractère d'appui</label>
+            <select id="secCharacter"></select>
+            <div class="rangeWrap">
+              <div class="rangeHead"><span class="hueLabel">Teinte</span><span class="rangeValue" id="secHueVal">0°</span></div>
+              <input id="secHue" type="range" min="0" max="360" value="0">
+            </div>
+            <div class="characterNote" id="secNote"></div>
+            <div class="keywords" id="secKeywords"></div>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="groupHeader" id="hdrAccChar">
+            <span id="labelAccChar">Accent 10%</span><span class="headerTag" id="tagAcc">Dark</span>
+          </div>
+          <div class="groupBody">
+            <label class="label" for="accCharacter" id="accCharacterLabel">Caractère d'accent</label>
+            <select id="accCharacter"></select>
+            <div class="rangeWrap">
+              <div class="rangeHead"><span class="hueLabel">Teinte</span><span class="rangeValue" id="accHueVal">0°</span></div>
+              <input id="accHue" type="range" min="0" max="360" value="0">
+            </div>
+            <div class="characterNote" id="accNote"></div>
+            <div class="keywords" id="accKeywords"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="band603010">
+        <div class="band60" id="band60"></div>
+        <div class="band30" id="band30"></div>
+        <div class="band10" id="band10"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel formatsPanel">
+    <p class="formatsTitle" id="formatsTitle">Formats couleur</p>
+    <div class="formatsGrid" id="formatsGrid"></div>
+  </div>
+
+  <p class="rule603010 panel" id="ruleText"></p>
+
+</div>
+
+<script>
+/* ================= Utilitaires / Helpers ================= */
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const normHue = h => ((h%360)+360)%360;
+const rand = (min,max)=>min + Math.random()*(max-min);
+const randi = (min,max)=>Math.floor(rand(min,max+1));
+
+function oklchStr(L,C,H){
+  return `oklch(${L.toFixed(1)}% ${C.toFixed(3)} ${normHue(H).toFixed(1)})`;
+}
+
+// Conversion OKLCH → sRGB pour les aperçus et formats exportables.
+// OKLCH → sRGB conversion for previews and exportable formats.
+function oklchToRgb(Lpct, C, Hdeg){
+  const L = clamp(Lpct, 0, 100) / 100;
+  const hRad = (normHue(Hdeg) * Math.PI) / 180;
+  const a = C * Math.cos(hRad);
+  const b = C * Math.sin(hRad);
+
+  const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
+  const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
+  const s_ = L - 0.0894841775 * a - 1.2914855480 * b;
+
+  const l = l_ * l_ * l_;
+  const m = m_ * m_ * m_;
+  const s = s_ * s_ * s_;
+
+  let rLin = +4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+  let gLin = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+  let bLin = -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s;
+
+  rLin = clamp(rLin, 0, 1);
+  gLin = clamp(gLin, 0, 1);
+  bLin = clamp(bLin, 0, 1);
+
+  const toSrgb = x => (x <= 0.0031308) ? 12.92*x : 1.055*Math.pow(x,1/2.4) - 0.055;
+  return {
+    r: Math.round(clamp(toSrgb(rLin), 0, 1) * 255),
+    g: Math.round(clamp(toSrgb(gLin), 0, 1) * 255),
+    b: Math.round(clamp(toSrgb(bLin), 0, 1) * 255)
+  };
+}
+
+function rgbToHex(r,g,b){
+  const toHex2 = x => Math.round(clamp(x,0,255)).toString(16).padStart(2,"0");
+  return `#${toHex2(r)}${toHex2(g)}${toHex2(b)}`.toUpperCase();
+}
+function oklchToHex(Lpct, C, Hdeg){
+  const rgb = oklchToRgb(Lpct, C, Hdeg);
+  return rgbToHex(rgb.r, rgb.g, rgb.b);
+}
+function rgbToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0;
+  const l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      default: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+  return { h: h * 360, s: s * 100, l: l * 100 };
+}
+function rgbToHsv(r,g,b){
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b), d = max - min;
+  let h = 0;
+  const s = max === 0 ? 0 : d / max;
+  const v = max;
+  if (d !== 0) {
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)); break;
+      case g: h = ((b - r) / d + 2); break;
+      default: h = ((r - g) / d + 4); break;
+    }
+    h *= 60;
+  }
+  return { h, s: s * 100, v: v * 100 };
+}
+function rgbToCmyk(r, g, b) {
+  const rn = r / 255, gn = g / 255, bn = b / 255;
+  const k = 1 - Math.max(rn, gn, bn);
+  if (k >= 1) return { c: 0, m: 0, y: 0, k: 100 };
+  return {
+    c: Math.round(((1 - rn - k) / (1 - k)) * 100),
+    m: Math.round(((1 - gn - k) / (1 - k)) * 100),
+    y: Math.round(((1 - bn - k) / (1 - k)) * 100),
+    k: Math.round(k * 100)
+  };
+}
+function rgbToXyz(r, g, b) {
+  const srgb = [r, g, b].map(v => {
+    v /= 255;
+    return v > 0.04045 ? Math.pow((v + 0.055) / 1.055, 2.4) : v / 12.92;
+  });
+  const [R, G, B] = srgb;
+  return {
+    x: (R * 0.4124 + G * 0.3576 + B * 0.1805) * 100,
+    y: (R * 0.2126 + G * 0.7152 + B * 0.0722) * 100,
+    z: (R * 0.0193 + G * 0.1192 + B * 0.9505) * 100
+  };
+}
+function xyzToLab(x, y, z) {
+  const ref = { x: 95.047, y: 100.000, z: 108.883 };
+  let xn = x / ref.x, yn = y / ref.y, zn = z / ref.z;
+  const f = t => t > 0.008856 ? Math.cbrt(t) : (7.787 * t) + 16/116;
+  xn = f(xn); yn = f(yn); zn = f(zn);
+  return { l: (116 * yn) - 16, a: 500 * (xn - yn), b: 200 * (yn - zn) };
+}
+function rgbToLab(r,g,b){
+  const xyz = rgbToXyz(r,g,b);
+  return xyzToLab(xyz.x, xyz.y, xyz.z);
+}
+function srgbChannelToLinear(c){
+  return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+}
+function relativeLuminanceFromRgb(r, g, b){
+  const R = srgbChannelToLinear(r / 255);
+  const G = srgbChannelToLinear(g / 255);
+  const B = srgbChannelToLinear(b / 255);
+  return 0.2126 * R + 0.7152 * G + 0.0722 * B;
+}
+function getTextColor(L, C, H){
+  const { r, g, b } = oklchToRgb(L, C, H);
+  return relativeLuminanceFromRgb(r, g, b) < 0.36 ? '#ffffff' : '#15171a';
+}
+// Regroupe les principaux formats colorimétriques d’une couleur.
+// Collects the main color formats for a given color.
+function colorFormats(color){
+  const rgb = oklchToRgb(color.L, color.C, color.H);
+  const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+  const cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b);
+  const lab = rgbToLab(rgb.r, rgb.g, rgb.b);
+  return {
+    hex,
+    rows: [
+      ["HEX", hex],
+      ["RGB", `${rgb.r}, ${rgb.g}, ${rgb.b}`],
+      ["HSL", `${Math.round(hsl.h)}°, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%`],
+      ["HSV", `${Math.round(hsv.h)}°, ${Math.round(hsv.s)}%, ${Math.round(hsv.v)}%`],
+      [I18N[lang].formatNames.cmyk, `${cmyk.c}, ${cmyk.m}, ${cmyk.y}, ${cmyk.k}`],
+      ["Lab", `${lab.l.toFixed(1)}, ${lab.a.toFixed(1)}, ${lab.b.toFixed(1)}`],
+      ["OKLCH", oklchStr(color.L, color.C, color.H)]
+    ]
+  };
+}
+function copyText(text, btn){
+  const done = () => {
+    if(!btn) return;
+    const old = btn.textContent;
+    btn.textContent = I18N[lang].copied;
+    btn.classList.add("copied");
+    window.setTimeout(() => {
+      btn.textContent = old;
+      btn.classList.remove("copied");
+    }, 900);
+  };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+  }else{
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, done){
+  const area = document.createElement("textarea");
+  area.value = text;
+  area.setAttribute("readonly", "");
+  area.style.position = "fixed";
+  area.style.left = "-9999px";
+  document.body.appendChild(area);
+  area.select();
+  try{ document.execCommand("copy"); }catch(e){}
+  document.body.removeChild(area);
+  if(done) done();
+}
+function makeFormatRow(label, value){
+  const row = document.createElement("div");
+  row.className = "formatRow";
+  const tag = document.createElement("div");
+  tag.className = "formatTag";
+  tag.textContent = label;
+  const val = document.createElement("div");
+  val.className = "formatValue";
+  val.textContent = value;
+  val.title = value;
+  const btn = document.createElement("button");
+  btn.className = "copyBtn";
+  btn.type = "button";
+  btn.textContent = I18N[lang].copy;
+  btn.addEventListener("click", () => copyText(value, btn));
+  row.append(tag, val, btn);
+  return row;
+}
+function applyRect(el, r){
+  el.style.left = r.x + "px";
+  el.style.top = r.y + "px";
+  el.style.width = r.w + "px";
+  el.style.height = r.h + "px";
+}
+function randomRectWithArea(targetArea, minSide, maxSide){
+  const w = clamp(randi(minSide, maxSide), minSide, maxSide);
+  const h = clamp(Math.round(targetArea / w), minSide, maxSide);
+  return { w, h };
+}
+
+/* ================= Données / Data ================= */
+const I18N = {
+  fr: {
+    classic: "Classique", character: "Caractère",
+    modeAria: "Choix du mode", collageTitle: "Clic : randomiser la disposition",
+    hintClassic: "Clic sur le carré : nouvelle disposition.",
+    hintCharacter: "Clic sur le carré : nouvelle disposition. Les teintes restent liées aux caractères.",
+    globalHue: "Teinte générale", globalHueHelp: "Décale simultanément les trois teintes sans changer leur caractère.",
+    dominant: "Dominante 60%", secondary: "Secondaire 30%", accent: "Accent 10%",
+    mainCharacter: "Caractère principal", supportCharacter: "Caractère d’appui", accentCharacter: "Caractère d’accent",
+    hue: "Teinte", formats: "Formats couleur", copy: "Copier", copied: "Copié",
+    formatNames: { d:"Dominante", s:"Secondaire", a:"Accent", cmyk:"CMJN" },
+    rules: {
+      classic: '<strong>Dominante (60 %)</strong> : installe l’humeur et l’atmosphère générale.<br><strong>Secondaire (30 %)</strong> : structure l’image et apporte profondeur et complexité.<br><strong>Accent (10 %)</strong> : crée le focus visuel et capte immédiatement l’attention.',
+      character: '<strong>Dominante (60 %)</strong> : donne le ton général, l’impression majeure, la première lecture.<br><strong>Secondaire (30 %)</strong> : nuance, stabilise ou contrebalance la dominante.<br><strong>Accent (10 %)</strong> : introduit la pointe de contraste psychologique qui évite la monotonie.'
+    },
+    characterData: {
+      vivid:{description:'Caractère très franc, saturé, expansif. Il attire immédiatement l’œil et impose une sensation d’énergie, d’affirmation ou de tension.',keywords:['énergie','impact','présence','franchise']},
+      muted:{description:'Caractère très retenu, assourdi, discret. Il installe une sensation de calme, de cohérence, de naturel, de stabilité ou de maturité.',keywords:['sobriété','calme','cohérence','subtilité']},
+      dark:{description:'Caractère lourd, sérieux, profond. Il suggère la gravité, la tension, la force, l’élégance sévère ou l’intériorité.',keywords:['gravité','mystère','densité','autorité']},
+      pale:{description:'Caractère doux, respirant, ouvert. Il évoque la clarté, la délicatesse, la lisibilité, le silence ou le recul.',keywords:['respiration','lumière','douceur','espace']}
+    }
+  },
+  en: {
+    classic: "Classic", character: "Character",
+    modeAria: "Mode selection", collageTitle: "Click: randomize layout",
+    hintClassic: "Click the square: new layout.",
+    hintCharacter: "Click the square: new layout. Hues remain linked to their characters.",
+    globalHue: "Global hue", globalHueHelp: "Shifts all three hues together without changing their character.",
+    dominant: "Dominant 60%", secondary: "Secondary 30%", accent: "Accent 10%",
+    mainCharacter: "Main character", supportCharacter: "Supporting character", accentCharacter: "Accent character",
+    hue: "Hue", formats: "Color formats", copy: "Copy", copied: "Copied",
+    formatNames: { d:"Dominant", s:"Secondary", a:"Accent", cmyk:"CMYK" },
+    rules: {
+      classic: '<strong>Dominant (60%)</strong>: establishes the overall mood and atmosphere.<br><strong>Secondary (30%)</strong>: structures the image and adds depth and complexity.<br><strong>Accent (10%)</strong>: creates the visual focus and immediately draws attention.',
+      character: '<strong>Dominant (60%)</strong>: sets the overall tone, strongest impression and first reading.<br><strong>Secondary (30%)</strong>: nuances, stabilizes or counterbalances the dominant color.<br><strong>Accent (10%)</strong>: introduces the touch of psychological contrast that prevents monotony.'
+    },
+    characterData: {
+      vivid:{description:'A very direct, saturated and expansive character. It immediately attracts the eye and conveys energy, assertion or tension.',keywords:['energy','impact','presence','directness']},
+      muted:{description:'A very restrained, subdued and discreet character. It creates a sense of calm, coherence, naturalness, stability or maturity.',keywords:['restraint','calm','coherence','subtlety']},
+      dark:{description:'A heavy, serious and deep character. It suggests gravity, tension, strength, severe elegance or introspection.',keywords:['gravity','mystery','density','authority']},
+      pale:{description:'A soft, airy and open character. It evokes clarity, delicacy, readability, silence or distance.',keywords:['airiness','light','softness','space']}
+    }
+  }
+};
+let lang = "fr";
+
+const STORAGE_KEY = "palette603010_fusion_v2";
+const SIZE = 150;
+const AREA = SIZE * SIZE;
+const CHARACTER_DATA = {
+  vivid: { label:'Vivid', L:62, C:0.38, defaultHue:18 },
+  muted: { label:'Muted', L:74, C:0.02, defaultHue:55 },
+  dark: { label:'Dark', L:38, C:0.12, defaultHue:250 },
+  pale: { label:'Pale', L:90, C:0.04, defaultHue:110 }
+};
+const OPTIONS = Object.keys(CHARACTER_DATA);
+/* ================= Références DOM / DOM references ================= */
+const dom = {
+  body: document.body,
+  langFrBtn: document.getElementById("langFrBtn"),
+  langEnBtn: document.getElementById("langEnBtn"),
+  modeSwitch: document.getElementById("modeSwitch"),
+  classicModeBtn: document.getElementById("classicModeBtn"),
+  characterModeBtn: document.getElementById("characterModeBtn"),
+  modeHint: document.getElementById("modeHint"),
+  ruleText: document.getElementById("ruleText"),
+  formatsTitle: document.getElementById("formatsTitle"),
+  globalHueLabelText: document.getElementById("globalHueLabelText"),
+  globalHueHelp: document.getElementById("globalHueHelp"),
+  labelDomClassic: document.getElementById("labelDomClassic"),
+  labelSecClassic: document.getElementById("labelSecClassic"),
+  labelAccClassic: document.getElementById("labelAccClassic"),
+  labelDomChar: document.getElementById("labelDomChar"),
+  labelSecChar: document.getElementById("labelSecChar"),
+  labelAccChar: document.getElementById("labelAccChar"),
+  domCharacterLabel: document.getElementById("domCharacterLabel"),
+  secCharacterLabel: document.getElementById("secCharacterLabel"),
+  accCharacterLabel: document.getElementById("accCharacterLabel"),
+  hueLabels: Array.from(document.querySelectorAll(".hueLabel")),
+
+  collage: document.getElementById("collage"),
+  domLayer: document.getElementById("domLayer"),
+  secLayer: document.getElementById("secLayer"),
+  accLayer: document.getElementById("accLayer"),
+  domTile: document.getElementById("domTile"),
+  secTile: document.getElementById("secTile"),
+  accTile: document.getElementById("accTile"),
+
+  band60: document.getElementById("band60"),
+  band30: document.getElementById("band30"),
+  band10: document.getElementById("band10"),
+
+  hdrDomClassic: document.getElementById("hdrDomClassic"),
+  hdrSecClassic: document.getElementById("hdrSecClassic"),
+  hdrAccClassic: document.getElementById("hdrAccClassic"),
+  hexDom: document.getElementById("hexDom"),
+  hexSec: document.getElementById("hexSec"),
+  hexAcc: document.getElementById("hexAcc"),
+  domL: document.getElementById("domL"),
+  domC: document.getElementById("domC"),
+  domH: document.getElementById("domH"),
+  secL: document.getElementById("secL"),
+  secC: document.getElementById("secC"),
+  secH: document.getElementById("secH"),
+  accL: document.getElementById("accL"),
+  accC: document.getElementById("accC"),
+  accH: document.getElementById("accH"),
+  domLVal: document.getElementById("domLVal"),
+  domCVal: document.getElementById("domCVal"),
+  domHVal: document.getElementById("domHVal"),
+  secLVal: document.getElementById("secLVal"),
+  secCVal: document.getElementById("secCVal"),
+  secHVal: document.getElementById("secHVal"),
+  accLVal: document.getElementById("accLVal"),
+  accCVal: document.getElementById("accCVal"),
+  accHVal: document.getElementById("accHVal"),
+
+  hdrDomChar: document.getElementById("hdrDomChar"),
+  hdrSecChar: document.getElementById("hdrSecChar"),
+  hdrAccChar: document.getElementById("hdrAccChar"),
+  tagDom: document.getElementById("tagDom"),
+  tagSec: document.getElementById("tagSec"),
+  tagAcc: document.getElementById("tagAcc"),
+  domCharacter: document.getElementById("domCharacter"),
+  secCharacter: document.getElementById("secCharacter"),
+  accCharacter: document.getElementById("accCharacter"),
+  domHue: document.getElementById("domHue"),
+  secHue: document.getElementById("secHue"),
+  accHue: document.getElementById("accHue"),
+  domHueVal: document.getElementById("domHueVal"),
+  secHueVal: document.getElementById("secHueVal"),
+  accHueVal: document.getElementById("accHueVal"),
+  globalHue: document.getElementById("globalHue"),
+  globalHueVal: document.getElementById("globalHueVal"),
+  domNote: document.getElementById("domNote"),
+  secNote: document.getElementById("secNote"),
+  accNote: document.getElementById("accNote"),
+  domKeywords: document.getElementById("domKeywords"),
+  secKeywords: document.getElementById("secKeywords"),
+  accKeywords: document.getElementById("accKeywords"),
+
+  formatsGrid: document.getElementById("formatsGrid")
+};
+
+/* ================= État / State ================= */
+let mode = "classic";
+let secRect = {x:18,y:18,w:90,h:72};
+let accRect = {x:88,y:88,w:52,h:40};
+let baseHues = { dom:180, sec:235, acc:70 };
+
+function getClassicColor(prefix){
+  return {
+    L: Number(dom[prefix+"L"].value),
+    C: Number(dom[prefix+"C"].value),
+    H: Number(dom[prefix+"H"].value)
+  };
+}
+function getCharacterColor(prefix){
+  const key = dom[prefix+"Character"].value;
+  const hue = Number(dom[prefix+"Hue"].value);
+  const data = CHARACTER_DATA[key];
+  return { L:data.L, C:data.C, H:hue, key, label:data.label };
+}
+function currentColors(){
+  if(mode === "character"){
+    return {
+      d:getCharacterColor("dom"),
+      s:getCharacterColor("sec"),
+      a:getCharacterColor("acc")
+    };
+  }
+  return {
+    d:getClassicColor("dom"),
+    s:getClassicColor("sec"),
+    a:getClassicColor("acc")
+  };
+}
+// Mémorise les réglages localement dans le navigateur.
+// Stores settings locally in the browser.
+function saveState(){
+  const state = {
+    mode,
+    lang,
+    classic: {
+      dom:{ L:dom.domL.value, C:dom.domC.value, H:dom.domH.value },
+      sec:{ L:dom.secL.value, C:dom.secC.value, H:dom.secH.value },
+      acc:{ L:dom.accL.value, C:dom.accC.value, H:dom.accH.value }
+    },
+    character: {
+      dom:dom.domCharacter.value,
+      sec:dom.secCharacter.value,
+      acc:dom.accCharacter.value,
+      baseHues,
+      globalHue:dom.globalHue.value
+    },
+    layout:{ secRect, accRect }
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return false;
+    const state = JSON.parse(raw);
+    if(state.mode === "classic" || state.mode === "character") mode = state.mode;
+    if(state.lang === "fr" || state.lang === "en") lang = state.lang;
+    if(state.classic?.dom){ dom.domL.value = state.classic.dom.L; dom.domC.value = state.classic.dom.C; dom.domH.value = state.classic.dom.H; }
+    if(state.classic?.sec){ dom.secL.value = state.classic.sec.L; dom.secC.value = state.classic.sec.C; dom.secH.value = state.classic.sec.H; }
+    if(state.classic?.acc){ dom.accL.value = state.classic.acc.L; dom.accC.value = state.classic.acc.C; dom.accH.value = state.classic.acc.H; }
+    if(state.character?.dom && CHARACTER_DATA[state.character.dom]) dom.domCharacter.value = state.character.dom;
+    if(state.character?.sec && CHARACTER_DATA[state.character.sec]) dom.secCharacter.value = state.character.sec;
+    if(state.character?.acc && CHARACTER_DATA[state.character.acc]) dom.accCharacter.value = state.character.acc;
+    if(state.character?.baseHues){
+      baseHues = {
+        dom:Number(state.character.baseHues.dom ?? CHARACTER_DATA[dom.domCharacter.value].defaultHue),
+        sec:Number(state.character.baseHues.sec ?? CHARACTER_DATA[dom.secCharacter.value].defaultHue),
+        acc:Number(state.character.baseHues.acc ?? CHARACTER_DATA[dom.accCharacter.value].defaultHue)
+      };
+    }
+    dom.globalHue.value = Number(state.character?.globalHue ?? 0);
+    if(state.layout?.secRect && state.layout?.accRect){
+      secRect = state.layout.secRect;
+      accRect = state.layout.accRect;
+    }
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+
+/* ================= Disposition aléatoire / Random layout ================= */
+// Génère une composition visuelle proche du ratio 60/30/10.
+// Generates a visual composition close to the 60/30/10 ratio.
+function randomizeLayout(){
+  const targetSecVisible = AREA * (mode === "character" ? 0.30 : 0.27);
+  const targetAcc = AREA * (mode === "character" ? 0.10 : 0.07);
+  const accDims = randomRectWithArea(targetAcc * rand(0.9, 1.1), mode === "character" ? 34 : 26, 100);
+  accRect = { x:randi(0, SIZE - accDims.w), y:randi(0, SIZE - accDims.h), w:accDims.w, h:accDims.h };
+
+  const accArea = accRect.w * accRect.h;
+  const overlapWanted = accArea * (mode === "character" ? 0.45 : 0.5);
+  const targetSecondaryArea = targetSecVisible + overlapWanted;
+  let placed = false;
+
+  for(let i=0;i<260;i++){
+    const dims = randomRectWithArea(targetSecondaryArea * rand(0.92, 1.08), mode === "character" ? 56 : 52, 140);
+    if(dims.h < accRect.h || dims.w < Math.ceil(accRect.w / 2)) continue;
+
+    const proposed = { x:randi(0, SIZE - dims.w), y:randi(0, SIZE - dims.h), w:dims.w, h:dims.h };
+    const yMin = proposed.y;
+    const yMax = proposed.y + proposed.h - accRect.h;
+    if(yMin > yMax) continue;
+
+    const yAcc = randi(yMin, yMax);
+    const halfW = accRect.w / 2;
+    const xLeft = Math.round(proposed.x - halfW);
+    const xRight = Math.round(proposed.x + proposed.w - halfW);
+    const candidates = [];
+    if(xLeft >= 0 && xLeft <= SIZE - accRect.w) candidates.push(xLeft);
+    if(xRight >= 0 && xRight <= SIZE - accRect.w) candidates.push(xRight);
+    if(!candidates.length) continue;
+
+    secRect = proposed;
+    accRect = { ...accRect, x:candidates[randi(0, candidates.length - 1)], y:yAcc };
+    placed = true;
+    break;
+  }
+
+  if(!placed){
+    const dims = randomRectWithArea(targetSecVisible + accArea, 56, 140);
+    const w = Math.max(dims.w, accRect.w);
+    const h = Math.max(dims.h, accRect.h);
+    secRect = {
+      w:clamp(w, 56, SIZE),
+      h:clamp(h, 56, SIZE),
+      x:clamp(accRect.x - 10, 0, SIZE - clamp(w, 56, SIZE)),
+      y:clamp(accRect.y - 10, 0, SIZE - clamp(h, 56, SIZE))
+    };
+  }
+  applyRect(dom.secLayer, secRect);
+  applyRect(dom.accLayer, accRect);
+  saveState();
+}
+
+/* ================= Rendu / Rendering ================= */
+// Reconstruit les cartes de formats selon la langue active.
+// Rebuilds format cards according to the active language.
+function renderFormats(colors){
+  const items = [
+    { name:I18N[lang].formatNames.d, color:colors.d },
+    { name:I18N[lang].formatNames.s, color:colors.s },
+    { name:I18N[lang].formatNames.a, color:colors.a }
+  ];
+  dom.formatsGrid.innerHTML = "";
+  items.forEach(item => {
+    const data = colorFormats(item.color);
+    const card = document.createElement("div");
+    card.className = "formatCard";
+    const head = document.createElement("div");
+    head.className = "formatCardHeader";
+    head.style.background = oklchStr(item.color.L, item.color.C, item.color.H);
+    head.style.color = getTextColor(item.color.L, item.color.C, item.color.H);
+    head.innerHTML = `<span>${item.name}</span><span>${data.hex}</span>`;
+    const rows = document.createElement("div");
+    rows.className = "formatRows";
+    data.rows.forEach(([label, value]) => rows.appendChild(makeFormatRow(label, value)));
+    card.append(head, rows);
+    dom.formatsGrid.appendChild(card);
+  });
+}
+function fillSelect(select){
+  select.innerHTML = OPTIONS.map(key => `<option value="${key}">${CHARACTER_DATA[key].label}</option>`).join('');
+}
+function buildKeywords(container, keywords){
+  container.innerHTML = keywords.map(word => `<span class="keyword">${word}</span>`).join('');
+}
+function syncDisplayedHues(){
+  const offset = Number(dom.globalHue.value);
+  dom.globalHueVal.textContent = `${offset > 0 ? '+' : ''}${offset}°`;
+  dom.domHue.value = Math.round(normHue(baseHues.dom + offset));
+  dom.secHue.value = Math.round(normHue(baseHues.sec + offset));
+  dom.accHue.value = Math.round(normHue(baseHues.acc + offset));
+}
+function setHeader(el, color){
+  const css = oklchStr(color.L, color.C, color.H);
+  el.style.background = css;
+  el.style.color = getTextColor(color.L, color.C, color.H);
+}
+function setTone(tileEl, bandEl, color){
+  tileEl.style.background = oklchStr(color.L, color.C, color.H);
+  bandEl.style.background = oklchStr(color.L, color.C, color.H);
+}
+function renderClassic(){
+  const d = getClassicColor("dom");
+  const s = getClassicColor("sec");
+  const a = getClassicColor("acc");
+
+  dom.domLVal.textContent = d.L.toFixed(0);
+  dom.domCVal.textContent = d.C.toFixed(2);
+  dom.domHVal.textContent = d.H.toFixed(0);
+  dom.secLVal.textContent = s.L.toFixed(0);
+  dom.secCVal.textContent = s.C.toFixed(2);
+  dom.secHVal.textContent = s.H.toFixed(0);
+  dom.accLVal.textContent = a.L.toFixed(0);
+  dom.accCVal.textContent = a.C.toFixed(2);
+  dom.accHVal.textContent = a.H.toFixed(0);
+
+  setHeader(dom.hdrDomClassic, d);
+  setHeader(dom.hdrSecClassic, s);
+  setHeader(dom.hdrAccClassic, a);
+  dom.hexDom.textContent = oklchToHex(d.L, d.C, d.H);
+  dom.hexSec.textContent = oklchToHex(s.L, s.C, s.H);
+  dom.hexAcc.textContent = oklchToHex(a.L, a.C, a.H);
+  setTone(dom.domTile, dom.band60, d);
+  setTone(dom.secTile, dom.band30, s);
+  setTone(dom.accTile, dom.band10, a);
+  renderFormats({ d, s, a });
+}
+function renderCharacterSection(prefix, color){
+  const data = CHARACTER_DATA[color.key];
+  const cap = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+  const tagEl = dom["tag" + cap];
+  const hdrEl = dom["hdr" + cap + "Char"];
+  const hueValEl = dom[prefix + "HueVal"];
+  const textColor = getTextColor(color.L, color.C, color.H);
+
+  const translated = I18N[lang].characterData[color.key];
+  dom[prefix + "Note"].textContent = translated.description;
+  tagEl.textContent = data.label;
+  tagEl.style.color = textColor;
+  hueValEl.textContent = `${Math.round(normHue(color.H))}°`;
+  buildKeywords(dom[prefix + "Keywords"], translated.keywords);
+  hdrEl.style.background = oklchStr(color.L, color.C, color.H);
+  hdrEl.style.color = textColor;
+}
+function renderCharacter(){
+  syncDisplayedHues();
+  const d = getCharacterColor("dom");
+  const s = getCharacterColor("sec");
+  const a = getCharacterColor("acc");
+  renderCharacterSection("dom", d);
+  renderCharacterSection("sec", s);
+  renderCharacterSection("acc", a);
+  setTone(dom.domTile, dom.band60, d);
+  setTone(dom.secTile, dom.band30, s);
+  setTone(dom.accTile, dom.band10, a);
+  renderFormats({ d, s, a });
+}
+function renderLanguage(){
+  const t = I18N[lang];
+  document.documentElement.lang = lang;
+  dom.langFrBtn.classList.toggle("active", lang === "fr");
+  dom.langEnBtn.classList.toggle("active", lang === "en");
+  dom.modeSwitch.setAttribute("aria-label", t.modeAria);
+  dom.classicModeBtn.textContent = t.classic;
+  dom.characterModeBtn.textContent = t.character;
+  dom.collage.title = t.collageTitle;
+  dom.globalHueLabelText.textContent = t.globalHue;
+  dom.globalHueHelp.textContent = t.globalHueHelp;
+  dom.labelDomClassic.textContent = t.dominant;
+  dom.labelSecClassic.textContent = t.secondary;
+  dom.labelAccClassic.textContent = t.accent;
+  dom.labelDomChar.textContent = t.dominant;
+  dom.labelSecChar.textContent = t.secondary;
+  dom.labelAccChar.textContent = t.accent;
+  dom.domCharacterLabel.textContent = t.mainCharacter;
+  dom.secCharacterLabel.textContent = t.supportCharacter;
+  dom.accCharacterLabel.textContent = t.accentCharacter;
+  dom.hueLabels.forEach(el => { el.textContent = t.hue; });
+  dom.formatsTitle.textContent = t.formats;
+}
+function switchLanguage(nextLang){
+  if(nextLang !== "fr" && nextLang !== "en") return;
+  lang = nextLang;
+  render();
+}
+
+function render(){
+  renderLanguage();
+  const t = I18N[lang];
+  dom.body.dataset.mode = mode;
+  dom.classicModeBtn.classList.toggle("active", mode === "classic");
+  dom.characterModeBtn.classList.toggle("active", mode === "character");
+  dom.modeHint.textContent = mode === "classic" ? t.hintClassic : t.hintCharacter;
+  dom.ruleText.innerHTML = t.rules[mode];
+  applyRect(dom.secLayer, secRect);
+  applyRect(dom.accLayer, accRect);
+  if(mode === "character") renderCharacter();
+  else renderClassic();
+  saveState();
+}
+function switchMode(nextMode){
+  if(nextMode !== "classic" && nextMode !== "character") return;
+  mode = nextMode;
+  render();
+}
+function setBaseHue(prefix, value){
+  baseHues[prefix] = normHue(Number(value));
+}
+
+/* ================= Initialisation / Initialization ================= */
+fillSelect(dom.domCharacter);
+fillSelect(dom.secCharacter);
+fillSelect(dom.accCharacter);
+dom.domCharacter.value = "muted";
+dom.secCharacter.value = "dark";
+dom.accCharacter.value = "pale";
+
+const hadState = loadState();
+if(!hadState){
+  dom.domL.value = 80;
+  dom.domC.value = 0.14;
+  dom.domH.value = 51;
+  dom.secL.value = 33;
+  dom.secC.value = 0.12;
+  dom.secH.value = 86;
+  dom.accL.value = 75;
+  dom.accC.value = 0.13;
+  dom.accH.value = 200;
+  dom.domCharacter.value = "muted";
+  dom.secCharacter.value = "dark";
+  dom.accCharacter.value = "pale";
+  baseHues = { dom:180, sec:235, acc:70 };
+  dom.globalHue.value = 0;
+}
+applyRect(dom.secLayer, secRect);
+applyRect(dom.accLayer, accRect);
+render();
+if(!hadState) randomizeLayout();
+
+/* ================= Événements / Events ================= */
+dom.langFrBtn.addEventListener("click", () => switchLanguage("fr"));
+dom.langEnBtn.addEventListener("click", () => switchLanguage("en"));
+dom.classicModeBtn.addEventListener("click", () => switchMode("classic"));
+dom.characterModeBtn.addEventListener("click", () => switchMode("character"));
+["domL","domC","domH","secL","secC","secH","accL","accC","accH"].forEach(id => {
+  dom[id].addEventListener("input", render);
+});
+["domCharacter","secCharacter","accCharacter"].forEach(id => {
+  dom[id].addEventListener("change", render);
+});
+dom.domHue.addEventListener("input", () => {
+  setBaseHue("dom", Number(dom.domHue.value) - Number(dom.globalHue.value));
+  render();
+});
+dom.secHue.addEventListener("input", () => {
+  setBaseHue("sec", Number(dom.secHue.value) - Number(dom.globalHue.value));
+  render();
+});
+dom.accHue.addEventListener("input", () => {
+  setBaseHue("acc", Number(dom.accHue.value) - Number(dom.globalHue.value));
+  render();
+});
+dom.globalHue.addEventListener("input", render);
+dom.collage.addEventListener("click", () => {
+  randomizeLayout();
+  render();
+});
+dom.collage.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  randomizeLayout();
+  render();
+}, { passive:false });
+</script>
+
+<footer class="eigrutel-app-footer">
+  <a href="https://www.stripmee.com" target="_blank" rel="noopener noreferrer">
+    Eigrutel BD Academy
+  </a>
+</footer>
+
+</body>
+</html>

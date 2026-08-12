@@ -1,0 +1,100 @@
+<!--
+Eigrutel Lab - Atelier d'outils libres pour la bande dessinée
+Programme conçu et développé par Simon Léturgie dans le cadre d'Eigrutel BD Academy.
+Nom : 60-30-10 — page de présentation
+Version : 1.0.0
+Date : 12-08-2026
+Code : GNU AGPL v3.0 ou version ultérieure.
+Documentation et modèles : CC BY-SA 4.0, sauf mention contraire.
+Marques, logos et signes distinctifs Eigrutel / Eigrutel Lab / Eigrutel BD Academy : réservés.
+-->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>60-30-10 — Eigrutel Lab</title>
+<meta name="description" content="60-30-10, outil bilingue FR/EN pour explorer une palette selon la règle 60 %, 30 %, 10 %. Eigrutel Lab.">
+<link rel="icon" type="image/png" href="fav603010.png">
+<link rel="apple-touch-icon" href="fav603010.png">
+<style>
+:root{--bg:#f2f3f5;--card:#fff;--ink:#15171a;--muted:#6b7280;--line:rgba(0,0,0,.1);--red:#A63D40;--blue:#1F3A44}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{width:min(920px,calc(100% - 28px));margin:0 auto;padding:42px 0 24px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:clamp(22px,5vw,48px)}
+.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:42px}
+.brand{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);opacity:.7}
+.lang{display:flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:#f7f8f9}
+.lang button{border:0;background:transparent;padding:7px 10px;border-radius:999px;font:inherit;font-size:11px;font-weight:800;color:var(--muted);cursor:pointer}
+.lang button.active{background:var(--red);color:#fff}
+h1{font-size:clamp(40px,8vw,76px);line-height:.95;margin:0 0 22px;letter-spacing:-.045em}
+.lead{font-size:clamp(18px,3vw,24px);line-height:1.4;max-width:720px;margin:0;color:#34383d}
+.rule{display:flex;height:28px;margin:34px 0 18px;border-radius:999px;overflow:hidden;background:#ddd}
+.rule span:nth-child(1){flex:60;background:#d7c0a2}.rule span:nth-child(2){flex:30;background:#53644d}.rule span:nth-child(3){flex:10;background:#b44d52}
+.legend{display:grid;grid-template-columns:6fr 3fr 1fr;gap:10px;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:34px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.launch{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:12px;background:var(--red);color:#fff;text-decoration:none;font-weight:800;font-size:14px}.version{font-size:12px;color:var(--muted)}
+.info{margin-top:42px;padding-top:24px;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.info h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 8px}.info p{font-size:14px;line-height:1.5;margin:0}
+footer{text-align:center;padding:24px 16px 34px}footer a{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);text-decoration:none;opacity:.7}
+[hidden]{display:none!important}@media(max-width:640px){main{padding-top:14px}.card{border-radius:16px}.top{margin-bottom:32px}.info{grid-template-columns:1fr}.legend{font-size:10px}}
+</style>
+</head>
+<body>
+<main>
+<section class="card">
+  <div class="top">
+    <div class="brand">Eigrutel Lab</div>
+    <div class="lang" aria-label="Langue / Language">
+      <button id="frBtn" class="active" type="button">FR</button>
+      <button id="enBtn" type="button">EN</button>
+    </div>
+  </div>
+
+  <div data-lang="fr">
+    <h1>60-30-10</h1>
+    <p class="lead">Explorer une palette en donnant 60 % à une couleur dominante, 30 % à une secondaire et 10 % à un accent.</p>
+  </div>
+  <div data-lang="en" hidden>
+    <h1>60-30-10</h1>
+    <p class="lead">Explore a palette by giving 60% to a dominant color, 30% to a secondary color and 10% to an accent.</p>
+  </div>
+
+  <div class="rule" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="legend" data-lang="fr"><span>Dominante · 60 %</span><span>Secondaire · 30 %</span><span>Accent · 10 %</span></div>
+  <div class="legend" data-lang="en" hidden><span>Dominant · 60%</span><span>Secondary · 30%</span><span>Accent · 10%</span></div>
+
+  <div class="actions">
+    <a class="launch" href="603010.html" data-lang="fr">Ouvrir 60-30-10</a>
+    <a class="launch" href="603010.html" data-lang="en" hidden>Open 60-30-10</a>
+    <span class="version">v1.0.0 · 12-08-2026</span>
+  </div>
+
+  <div class="info" data-lang="fr">
+    <div><h2>Deux approches</h2><p>Réglage libre en OKLCH ou exploration par caractères colorés.</p></div>
+    <div><h2>Valeurs</h2><p>HEX, RGB, HSL, HSV, CMJN, Lab et OKLCH, prêtes à copier.</p></div>
+    <div><h2>Local</h2><p>Application autonome. Les réglages restent dans le navigateur.</p></div>
+  </div>
+  <div class="info" data-lang="en" hidden>
+    <div><h2>Two approaches</h2><p>Free OKLCH controls or exploration through color characters.</p></div>
+    <div><h2>Values</h2><p>HEX, RGB, HSL, HSV, CMYK, Lab and OKLCH, ready to copy.</p></div>
+    <div><h2>Local</h2><p>Standalone application. Settings stay in the browser.</p></div>
+  </div>
+</section>
+</main>
+<footer><a href="https://www.stripmee.com" target="_blank" rel="noopener noreferrer">Eigrutel BD Academy</a></footer>
+<script>
+const frBtn=document.getElementById('frBtn');
+const enBtn=document.getElementById('enBtn');
+function setLang(lang){
+  document.documentElement.lang=lang;
+  document.querySelectorAll('[data-lang]').forEach(el=>{el.hidden=el.dataset.lang!==lang});
+  frBtn.classList.toggle('active',lang==='fr');
+  enBtn.classList.toggle('active',lang==='en');
+  localStorage.setItem('603010_index_lang',lang);
+}
+frBtn.addEventListener('click',()=>setLang('fr'));
+enBtn.addEventListener('click',()=>setLang('en'));
+setLang(localStorage.getItem('603010_index_lang')==='en'?'en':'fr');
+</script>
+</body>
+</html>
